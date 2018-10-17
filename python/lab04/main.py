@@ -14,6 +14,22 @@ def system(f, t):
     dvdt = -g - (A*v + B*v**3)/m
     return [dzdt,dvdt]
 
+def poletnoe(t, v, z):
+    ttm = 0.0 # время полета
+    ttmi = 0;
+    ttz = 0.0  # высота подъема
+    t_pod = 0.0 # время подъема
+    t_spusk = 0.0 # время спуска
+    for i in range(0, len(t)-1, 1):
+        if z[i] >= 0.0:
+            ttm = t[i]
+            ttmi = i
+        if z[i] >= ttz:
+            ttz = z[i]
+            t_pod = t[i]
+    t_spusk = ttm - t_pod
+    return [ttmi, ttm, ttz, t_pod, t_spusk]
+
 
 if __name__ == '__main__':
     import numpy as np
@@ -34,6 +50,20 @@ if __name__ == '__main__':
     sol = odeint(system, [z0, v0], t) # решаем
     z = sol[:, 0]
     v = sol[:, 1]
+
+    solv = poletnoe(t, v, z)
+    ttmi = solv[0]
+    ttm = solv[1]
+    maxz = solv[2]
+    t_pod = solv[3]
+    t_spusk = solv[4]
+
+    t = t[:ttmi]
+    v = v[:ttmi]
+    z = z[:ttmi]
+    nt = ttmi
+    tm = ttm
+
 
     # и строим графики Здесь полетное время не вичислено!!
     plt.plot(t, v, 'r-', linewidth=3) # график скорости от времени
